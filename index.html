@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Alpha Garage · Central de Comando</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='24' fill='%23ff6a00'/><text x='50' y='73' font-size='64' font-family='Arial' font-weight='bold' text-anchor='middle' fill='%23120a04'>A</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+/* ============ BASE ============ */
+:root{
+  --bg:#08080b;
+  --border:rgba(255,255,255,.07);
+  --text:#f4f4f6;
+  --muted:#8b8b96;
+  --accent:#ff7a18;
+  --gap:18px;
+  --pv:3;                       /* cards visíveis por vez */
+  --font-display:'Chakra Petch',system-ui,sans-serif;
+  --font-body:'Inter',system-ui,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:var(--font-body);
+  background:var(--bg);color:var(--text);
+  min-height:100vh;overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+  display:flex;flex-direction:column;
+}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:8px}
+
+/* ============ FUNDO ============ */
+body::before{
+  content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:
+    linear-gradient(rgba(255,255,255,.03) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.03) 1px,transparent 1px);
+  background-size:60px 60px;
+  -webkit-mask-image:radial-gradient(ellipse 90% 55% at 50% 0%,#000 30%,transparent 78%);
+          mask-image:radial-gradient(ellipse 90% 55% at 50% 0%,#000 30%,transparent 78%);
+}
+.glow{position:fixed;border-radius:50%;filter:blur(130px);pointer-events:none;z-index:0}
+.glow-1{width:640px;height:640px;background:rgba(255,122,24,.14);top:-300px;left:-180px}
+.glow-2{width:540px;height:540px;background:rgba(34,211,238,.07);bottom:-300px;right:-160px}
+.glow-3{width:420px;height:420px;background:rgba(167,139,250,.06);top:45%;right:-240px}
+
+/* ============ TOPBAR ============ */
+.topbar{
+  position:sticky;top:0;z-index:50;
+  background:rgba(8,8,11,.72);
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--border);
+}
+.topbar-inner{
+  max-width:1200px;margin:0 auto;padding:13px 24px;
+  display:flex;align-items:center;justify-content:space-between;gap:16px;
+}
+.brand{display:flex;align-items:center;gap:12px}
+.brand-mark{
+  width:42px;height:42px;border-radius:12px;flex-shrink:0;
+  display:grid;place-items:center;
+  background:linear-gradient(145deg,#ff9a3d,#ff4d00);
+  font-family:var(--font-display);font-weight:700;font-size:23px;color:#150a02;
+  box-shadow:0 8px 22px -8px rgba(255,110,20,.8),inset 0 1px 0 rgba(255,255,255,.4);
+}
+.brand-text{display:flex;flex-direction:column;line-height:1.12}
+.brand-text strong{font-family:var(--font-display);font-size:15.5px;font-weight:700;letter-spacing:.08em}
+.brand-text span{font-size:9.5px;font-weight:600;letter-spacing:.3em;color:var(--muted)}
+.clock{display:flex;flex-direction:column;align-items:flex-end;line-height:1.15}
+.clock time{
+  font-family:var(--font-display);font-size:20px;font-weight:600;
+  letter-spacing:.06em;font-variant-numeric:tabular-nums;
+}
+.clock small{font-size:11px;color:var(--muted);letter-spacing:.05em;text-transform:capitalize}
+
+/* ============ HERO ============ */
+.wrap{
+  width:100%;max-width:1200px;margin:0 auto;padding:0 24px;
+  position:relative;z-index:1;flex:1;
+  display:flex;flex-direction:column;justify-content:center;
+}
+.hero{padding:40px 0 26px;text-align:center}
+.hero-badge{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:7px 15px;border-radius:999px;
+  background:rgba(255,122,24,.08);border:1px solid rgba(255,122,24,.22);
+  color:#ffb37a;font-size:11.5px;font-weight:600;
+  letter-spacing:.09em;text-transform:uppercase;margin-bottom:18px;
+}
+.hero-badge::before{
+  content:"";width:6px;height:6px;border-radius:50%;
+  background:var(--accent);box-shadow:0 0 10px var(--accent);
+  animation:pulse 2.4s ease-in-out infinite;
+}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.45;transform:scale(.8)}}
+.hero h1{
+  font-family:var(--font-display);
+  font-size:clamp(30px,5vw,50px);
+  font-weight:700;line-height:1.05;letter-spacing:-.015em;
+}
+.hero h1 .grad{
+  background:linear-gradient(100deg,#ffc46b,#ff6a00 55%,#ff3d00);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.hero p{
+  max-width:520px;margin:12px auto 0;
+  color:var(--muted);font-size:15px;line-height:1.6;
+}
+
+/* ============ CARROSSEL ============ */
+.carousel{position:relative;padding:8px 0 20px}
+
+.track{
+  display:flex;
+  gap:var(--gap);
+  overflow-x:auto;
+  scroll-snap-type:x mandatory;
+  scroll-behavior:smooth;
+  scrollbar-width:none;
+  -ms-overflow-style:none;
+  padding:14px 2px 18px;
+  cursor:grab;
+}
+.track::-webkit-scrollbar{display:none}
+.track.dragging{cursor:grabbing;scroll-snap-type:none;scroll-behavior:auto}
+.track.dragging .slide{pointer-events:none}
+
+/* ---- SLIDE / CARD ---- */
+.slide{
+  flex:0 0 calc((100% - (var(--pv) - 1) * var(--gap)) / var(--pv));
+  scroll-snap-align:start;
+  position:relative;
+  display:flex;flex-direction:column;
+  padding:24px;
+  border-radius:22px;
+  background:
+    linear-gradient(165deg,rgba(255,255,255,.055) 0%,rgba(255,255,255,.018) 45%,rgba(255,255,255,.008) 100%),
+    #0e0e12;
+  border:1px solid var(--border);
+  overflow:hidden;
+  isolation:isolate;
+  text-decoration:none;color:inherit;
+  min-height:255px;
+  transition:transform .4s cubic-bezier(.2,.7,.3,1),border-color .35s,box-shadow .4s;
+  animation:rise .55s cubic-bezier(.2,.7,.3,1) backwards;
+  animation-delay:calc(var(--i,0) * 65ms);
+  -webkit-user-select:none;user-select:none;
+  -webkit-tap-highlight-color:transparent;
+}
+@keyframes rise{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+
+/* linha de acento */
+.slide::before{
+  content:"";position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,var(--c),transparent);
+  opacity:0;transition:opacity .35s;
+}
+/* brilho que segue o mouse */
+.slide::after{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(440px circle at var(--mx,50%) var(--my,0%),
+             color-mix(in srgb,var(--c) 15%,transparent),transparent 45%);
+  opacity:0;transition:opacity .4s;
+}
+.slide:hover{
+  transform:translateY(-7px) scale(1.012);
+  border-color:color-mix(in srgb,var(--c) 48%,transparent);
+  box-shadow:0 26px 50px -22px rgba(0,0,0,.95),
+             0 0 0 1px color-mix(in srgb,var(--c) 20%,transparent),
+             0 14px 56px -24px color-mix(in srgb,var(--c) 60%,transparent);
+}
+.slide:hover::before,.slide:hover::after{opacity:1}
+.slide:active{transform:translateY(-3px) scale(.995)}
+
+.card-icon{
+  width:54px;height:54px;border-radius:16px;flex-shrink:0;
+  display:grid;place-items:center;
+  background:color-mix(in srgb,var(--c) 13%,transparent);
+  border:1px solid color-mix(in srgb,var(--c) 27%,transparent);
+  color:var(--c);
+  margin-bottom:20px;
+  transition:transform .38s cubic-bezier(.2,.7,.3,1),box-shadow .38s;
+}
+.card-icon svg{width:27px;height:27px}
+.slide:hover .card-icon{
+  transform:scale(1.08) rotate(-5deg);
+  box-shadow:0 0 30px -8px var(--c);
+}
+
+.card-tag{
+  display:block;margin-bottom:7px;
+  font-size:10.5px;font-weight:700;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--c);opacity:.88;
+}
+.slide h3{
+  font-family:var(--font-display);
+  font-size:20px;font-weight:600;line-height:1.22;margin-bottom:9px;
+}
+.slide p{
+  font-size:13.5px;line-height:1.6;color:var(--muted);
+  flex:1;margin-bottom:18px;
+}
+.card-foot{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  margin-top:auto;padding-top:14px;
+  border-top:1px solid var(--border);
+  font-size:11px;color:#6f6f7a;
+}
+.status{
+  display:inline-flex;align-items:center;gap:6px;
+  font-size:10.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;
+  color:#7d7d88;
+}
+.status i{
+  width:6px;height:6px;border-radius:50%;
+  background:#34d399;box-shadow:0 0 8px rgba(52,211,153,.9);
+}
+.enter{
+  display:inline-flex;align-items:center;gap:5px;
+  color:var(--c);font-weight:600;font-size:11px;
+  letter-spacing:.04em;opacity:.75;transition:opacity .25s,transform .25s;
+}
+.slide:hover .enter{opacity:1;transform:translateX(3px)}
+.enter svg{width:13px;height:13px}
+
+/* ---- SETAS ---- */
+.nav{
+  position:absolute;top:calc(50% - 20px);z-index:10;
+  width:46px;height:46px;border-radius:50%;
+  display:grid;place-items:center;
+  background:rgba(20,20,26,.9);
+  border:1px solid var(--border);
+  color:#cfcfd8;cursor:pointer;
+  backdrop-filter:blur(10px);
+  transition:background .25s,color .25s,border-color .25s,transform .25s,opacity .25s;
+  box-shadow:0 10px 26px -10px rgba(0,0,0,.9);
+}
+.nav:hover:not(:disabled){
+  background:var(--accent);color:#150a02;border-color:transparent;
+  transform:scale(1.09);
+}
+.nav:active:not(:disabled){transform:scale(.95)}
+.nav:disabled{opacity:.22;cursor:not-allowed}
+.nav svg{width:20px;height:20px}
+.nav.prev{left:-14px}
+.nav.next{right:-14px}
+
+/* ---- DOTS ---- */
+.dots{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  margin-top:6px;
+}
+.dot{
+  width:8px;height:8px;border-radius:50%;padding:0;
+  background:rgba(255,255,255,.16);border:none;cursor:pointer;
+  transition:background .3s,width .3s,transform .3s;
+}
+.dot:hover{background:rgba(255,255,255,.34)}
+.dot.active{
+  width:26px;border-radius:99px;
+  background:linear-gradient(90deg,#ff9a3d,#ff4d00);
+  box-shadow:0 0 14px -2px rgba(255,110,20,.9);
+}
+
+/* ============ FOOTER ============ */
+.footer{
+  border-top:1px solid var(--border);
+  background:rgba(255,255,255,.012);
+  position:relative;z-index:1;
+}
+.footer-inner{
+  max-width:1200px;margin:0 auto;padding:18px 24px;
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  font-size:12px;color:#6a6a75;
+}
+
+/* ============ RESPONSIVO ============ */
+@media (max-width:1000px){
+  :root{--pv:2}
+  .nav.prev{left:-6px}
+  .nav.next{right:-6px}
+}
+@media (max-width:700px){
+  :root{--pv:1;--gap:14px}
+  .wrap{padding:0 18px}
+  .hero{padding:30px 0 20px}
+  .hero p{font-size:14px}
+  .nav{display:none}                 /* no celular usa arraste + dots */
+  .slide{padding:22px;min-height:235px}
+  .track{padding:10px 2px 14px}
+  .brand-text strong{font-size:14px}
+  .brand-text span{font-size:9px;letter-spacing:.24em}
+  .brand-mark{width:38px;height:38px;font-size:20px}
+  .clock time{font-size:17px}
+  .clock small{font-size:10px}
+  .footer-inner{flex-direction:column;gap:6px;text-align:center}
+  .dot{width:7px;height:7px}
+  .dot.active{width:20px}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.001ms !important;transition-duration:.001ms !important}
+  .track{scroll-behavior:auto}
+}
+</style>
+</head>
+
+<body>
+
+<div class="glow glow-1"></div>
+<div class="glow glow-2"></div>
+<div class="glow glow-3"></div>
+
+<!-- ============ TOPBAR ============ -->
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="brand">
+      <div class="brand-mark">A</div>
+      <div class="brand-text">
+        <strong>ALPHA GARAGE</strong>
+        <span>FULL SERVICE</span>
+      </div>
+    </div>
+    <div class="clock">
+      <time id="clock-time">--:--:--</time>
+      <small id="clock-date">carregando…</small>
+    </div>
+  </div>
+</header>
+
+<!-- ============ CONTEÚDO ============ -->
+<main class="wrap">
+
+  <section class="hero">
+    <div class="hero-badge" id="hero-badge">Central de sistemas</div>
+    <h1>Central de <span class="grad">Comando</span></h1>
+    <p>Deslize e toque em qualquer card para abrir o sistema da oficina.</p>
+  </section>
+
+  <section class="carousel" id="carousel" aria-roledescription="carrossel" aria-label="Sistemas da oficina">
+
+    <button class="nav prev" id="prev" type="button" aria-label="Sistema anterior">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+           stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+    </button>
+
+    <div class="track" id="track" tabindex="0" aria-label="Lista de sistemas — use as setas do teclado"></div>
+
+    <button class="nav next" id="next" type="button" aria-label="Próximo sistema">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+           stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+    </button>
+
+    <div class="dots" id="dots" role="tablist" aria-label="Selecionar sistema"></div>
+  </section>
+
+</main>
+
+<!-- ============ FOOTER ============ -->
+<footer class="footer">
+  <div class="footer-inner">
+    <span>© <span id="ano"></span> Alpha Garage Full Service</span>
+    <span>Central de Comando · v2.0</span>
+  </div>
+</footer>
+
+<script>
+/* =========================================================
+   1) SISTEMAS — ordem do carrossel
+   ========================================================= */
+const SISTEMAS = [
+  {
+    id:'agendamentos', nome:'Agendamentos Alpha', tag:'Agenda', cor:'#60a5fa',
+    icone:'calendario',
+    desc:'Agendamento de serviços e organização da fila de atendimento.',
+    url:'https://paulinhoribeiro.github.io/agendamentosAlpha/'
+  },
+  {
+    id:'patio', nome:'Oficina Smart Pro', tag:'Pátio', cor:'#ff7a18',
+    icone:'carro',
+    desc:'Gestão completa do pátio — veículos, vagas e status em tempo real.',
+    url:'https://paulinhoribeiro.github.io/Oficina-Smart-Pro/'
+  },
+  {
+    id:'saida', nome:'ControleOficina', tag:'Saída', cor:'#ff3d71',
+    icone:'saida',
+    desc:'Controle de saída de veículos e liberação de ordens de serviço.',
+    url:'https://paulinhoribeiro.github.io/Controlefluxooficina/'
+  },
+  {
+    id:'timeflow', nome:'TimeFlow Oficina', tag:'Tempo', cor:'#a78bfa',
+    icone:'relogio',
+    desc:'Controle de tempo por serviço e produtividade da equipe.',
+    url:'https://timeflow-oficina.onrender.com/'
+  },
+  {
+    id:'financeiro', nome:'Controle Financeiro', tag:'Financeiro', cor:'#34d399',
+    icone:'grafico',
+    desc:'Custos e lucro real por Ordem de Serviço, com precisão.',
+    url:'https://financeiroalpha.onrender.com/'
+  },
+  {
+    id:'comissoes', nome:'Comissões', tag:'Comissões', cor:'#fbbf24',
+    icone:'moeda',
+    desc:'Cálculo e acompanhamento das comissões da equipe por serviço.',
+    url:'https://paulinhoribeiro.github.io/Comiss-es/'
+  },
+  {
+    id:'rastreio', nome:'Rastreio de Encomendas', tag:'Logística', cor:'#22d3ee',
+    icone:'pacote',
+    desc:'Acompanhe o status e a localização de peças e encomendas.',
+    url:'https://paulinhoribeiro.github.io/sistemaderastreio/'
+  }
+];
+
+/* =========================================================
+   2) ÍCONES
+   ========================================================= */
+const SVG = (p) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+  stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${p}</svg>`;
+
+const ICONES = {
+  carro: SVG(`
+    <path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/>
+    <circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/>`),
+  saida: SVG(`
+    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+    <polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/>`),
+  pacote: SVG(`
+    <path d="m7.5 4.27 9 5.15"/>
+    <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/>
+    <path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/>`),
+  relogio: SVG(`<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>`),
+  grafico: SVG(`
+    <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/>
+    <polyline points="16 7 22 7 22 13"/>`),
+  calendario: SVG(`
+    <rect x="3" y="4" width="18" height="18" rx="2"/>
+    <line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/>
+    <line x1="3" y1="10" x2="21" y2="10"/>
+    <circle cx="8.5" cy="15" r="1" fill="currentColor" stroke="none"/>
+    <circle cx="12.5" cy="15" r="1" fill="currentColor" stroke="none"/>`),
+  moeda: SVG(`
+    <circle cx="12" cy="12" r="10"/>
+    <path d="M16 8.5h-4.5a2 2 0 0 0 0 4H13a2 2 0 0 1 0 4H8"/>
+    <line x1="12" y1="6" x2="12" y2="18"/>`)
+};
+
+/* =========================================================
+   3) RENDER DOS SLIDES
+   ========================================================= */
+const track  = document.getElementById('track');
+const dotsEl = document.getElementById('dots');
+const prevBt = document.getElementById('prev');
+const nextBt = document.getElementById('next');
+
+track.innerHTML = SISTEMAS.map((s, i) => `
+  <a class="slide"
+     href="${s.url}"
+     target="_blank"
+     rel="noopener noreferrer"
+     style="--c:${s.cor};--i:${i}"
+     aria-label="Abrir ${s.nome} em nova aba">
+
+    <div class="card-icon">${ICONES[s.icone] || ICONES.carro}</div>
+    <span class="card-tag">${s.tag}</span>
+    <h3>${s.nome}</h3>
+    <p>${s.desc}</p>
+
+    <div class="card-foot">
+      <span class="status"><i></i>Online</span>
+      <span class="enter">
+        Entrar
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+             stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="9 18 15 12 9 6"/>
+        </svg>
+      </span>
+    </div>
+  </a>
+`).join('');
+
+const slides = [...track.querySelectorAll('.slide')];
+
+dotsEl.innerHTML = slides.map((_, i) =>
+  `<button class="dot" type="button" role="tab" data-i="${i}"
+           aria-label="Ir para o sistema ${i + 1}"></button>`
+).join('');
+
+const dots = [...dotsEl.querySelectorAll('.dot')];
+
+/* =========================================================
+   4) NAVEGAÇÃO
+   ========================================================= */
+const step = () => {
+  const a = slides[0].getBoundingClientRect();
+  const b = slides[1] ? slides[1].getBoundingClientRect() : null;
+  return a.width + (b ? b.left - a.right : 0);
+};
+
+const irPara = (i) => {
+  const s = slides[i];
+  if (!s) return;
+  track.scrollTo({ left: s.offsetLeft - track.offsetLeft, behavior: 'smooth' });
+};
+
+prevBt.addEventListener('click', () => track.scrollBy({ left: -step(), behavior: 'smooth' }));
+nextBt.addEventListener('click', () => track.scrollBy({ left:  step(), behavior: 'smooth' }));
+
+dots.forEach(d => d.addEventListener('click', () => irPara(+d.dataset.i)));
+
+/* setas do teclado quando o track está focado */
+track.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowRight') { e.preventDefault(); nextBt.click(); }
+  if (e.key === 'ArrowLeft')  { e.preventDefault(); prevBt.click(); }
+});
+
+/* =========================================================
+   5) ESTADO VISUAL (dots + setas desabilitadas)
+   ========================================================= */
+let raf = null;
+
+function updateUI() {
+  const max   = track.scrollWidth - track.clientWidth;
+  const sl    = track.scrollLeft;
+  const passo = step();
+
+  // dot ativo = slide mais próximo da borda esquerda
+  let ativo = 0, menor = Infinity;
+  slides.forEach((s, i) => {
+    const d = Math.abs(s.offsetLeft - track.offsetLeft - sl);
+    if (d < menor) { menor = d; ativo = i; }
+  });
+
+  // na última posição, ativa o último slide visível
+  if (sl >= max - 2) ativo = slides.length - 1;
+
+  dots.forEach((d, i) => {
+    d.classList.toggle('active', i === ativo);
+    d.setAttribute('aria-selected', i === ativo);
+  });
+
+  prevBt.disabled = sl <= 2;
+  nextBt.disabled = sl >= max - 2;
+}
+
+track.addEventListener('scroll', () => {
+  cancelAnimationFrame(raf);
+  raf = requestAnimationFrame(updateUI);
+}, { passive: true });
+
+window.addEventListener('resize', updateUI);
+
+/* =========================================================
+   6) BRILHO QUE SEGUE O MOUSE
+   ========================================================= */
+track.addEventListener('pointermove', (e) => {
+  if (e.pointerType !== 'mouse') return;
+  const card = e.target.closest('.slide');
+  if (!card) return;
+  const r = card.getBoundingClientRect();
+  card.style.setProperty('--mx', `${e.clientX - r.left}px`);
+  card.style.setProperty('--my', `${e.clientY - r.top}px`);
+});
+
+/* =========================================================
+   7) ARRASTE COM O MOUSE (desktop)
+   ---------------------------------------------------------
+   No celular o scroll nativo por toque já funciona sozinho.
+   ========================================================= */
+let arrastando = false, inicioX = 0, inicioScroll = 0, moveu = false;
+
+track.addEventListener('pointerdown', (e) => {
+  if (e.pointerType !== 'mouse' || e.button !== 0) return;
+  arrastando   = true;
+  moveu        = false;
+  inicioX      = e.clientX;
+  inicioScroll = track.scrollLeft;
+});
+
+window.addEventListener('pointermove', (e) => {
+  if (!arrastando) return;
+  const dx = e.clientX - inicioX;
+  if (Math.abs(dx) > 5) {
+    moveu = true;
+    track.classList.add('dragging');
+  }
+  track.scrollLeft = inicioScroll - dx;
+});
+
+window.addEventListener('pointerup', () => {
+  if (!arrastando) return;
+  arrastando = false;
+  track.classList.remove('dragging');
+
+  if (moveu) {
+    // encaixa no slide mais próximo após soltar
+    const passo = step();
+    const alvo  = Math.round(track.scrollLeft / passo);
+    track.scrollTo({ left: alvo * passo, behavior: 'smooth' });
+  }
+});
+
+// impede abrir o link se o usuário arrastou
+track.addEventListener('click', (e) => {
+  if (moveu) { e.preventDefault(); moveu = false; }
+}, true);
+
+/* =========================================================
+   8) RELÓGIO
+   ========================================================= */
+const timeEl = document.getElementById('clock-time');
+const dateEl = document.getElementById('clock-date');
+
+function tick() {
+  const now = new Date();
+  timeEl.textContent = now.toLocaleTimeString('pt-BR', { hour12: false });
+  dateEl.textContent = now.toLocaleDateString('pt-BR', {
+    weekday: 'short', day: '2-digit', month: 'short'
+  }).replace(/\./g, '');
+}
+tick();
+setInterval(tick, 1000);
+
+/* =========================================================
+   9) INICIALIZAÇÃO
+   ========================================================= */
+document.getElementById('hero-badge').textContent = `${SISTEMAS.length} sistemas conectados`;
+document.getElementById('ano').textContent = new Date().getFullYear();
+
+updateUI();
+</script>
+
+</body>
+</html>
