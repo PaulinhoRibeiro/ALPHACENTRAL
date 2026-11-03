@@ -289,7 +289,7 @@ body::before{
   .wrap{padding:0 18px}
   .hero{padding:30px 0 20px}
   .hero p{font-size:14px}
-  .nav{display:none}                 /* no celular usa arraste + dots */
+  .nav{display:none}
   .slide{padding:22px;min-height:235px}
   .track{padding:10px 2px 14px}
   .brand-text strong{font-size:14px}
@@ -363,7 +363,7 @@ body::before{
 <footer class="footer">
   <div class="footer-inner">
     <span>© <span id="ano"></span> Alpha Garage Full Service</span>
-    <span>Central de Comando · v2.0</span>
+    <span>Central de Comando · v2.1</span>
   </div>
 </footer>
 
@@ -389,6 +389,12 @@ const SISTEMAS = [
     icone:'saida',
     desc:'Controle de saída de veículos e liberação de ordens de serviço.',
     url:'https://paulinhoribeiro.github.io/Controlefluxooficina/'
+  },
+  {
+    id:'almoxarifado', nome:'Almoxarifado Alpha', tag:'Estoque', cor:'#14b8a6',
+    icone:'estoque',
+    desc:'Controle de estoque do almoxarifado — peças, entradas e saídas.',
+    url:'https://estoquealpha-a5927.web.app/'
   },
   {
     id:'timeflow', nome:'TimeFlow Oficina', tag:'Tempo', cor:'#a78bfa',
@@ -429,6 +435,10 @@ const ICONES = {
   saida: SVG(`
     <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
     <polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/>`),
+  estoque: SVG(`
+    <path d="M3 9.5 12 4l9 5.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1Z"/>
+    <path d="M3 9.5h18"/>
+    <path d="M9 21v-7h6v7"/>`),
   pacote: SVG(`
     <path d="m7.5 4.27 9 5.15"/>
     <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/>
@@ -512,30 +522,26 @@ nextBt.addEventListener('click', () => track.scrollBy({ left:  step(), behavior:
 
 dots.forEach(d => d.addEventListener('click', () => irPara(+d.dataset.i)));
 
-/* setas do teclado quando o track está focado */
 track.addEventListener('keydown', (e) => {
   if (e.key === 'ArrowRight') { e.preventDefault(); nextBt.click(); }
   if (e.key === 'ArrowLeft')  { e.preventDefault(); prevBt.click(); }
 });
 
 /* =========================================================
-   5) ESTADO VISUAL (dots + setas desabilitadas)
+   5) ESTADO VISUAL
    ========================================================= */
 let raf = null;
 
 function updateUI() {
   const max   = track.scrollWidth - track.clientWidth;
   const sl    = track.scrollLeft;
-  const passo = step();
 
-  // dot ativo = slide mais próximo da borda esquerda
   let ativo = 0, menor = Infinity;
   slides.forEach((s, i) => {
     const d = Math.abs(s.offsetLeft - track.offsetLeft - sl);
     if (d < menor) { menor = d; ativo = i; }
   });
 
-  // na última posição, ativa o último slide visível
   if (sl >= max - 2) ativo = slides.length - 1;
 
   dots.forEach((d, i) => {
@@ -568,8 +574,6 @@ track.addEventListener('pointermove', (e) => {
 
 /* =========================================================
    7) ARRASTE COM O MOUSE (desktop)
-   ---------------------------------------------------------
-   No celular o scroll nativo por toque já funciona sozinho.
    ========================================================= */
 let arrastando = false, inicioX = 0, inicioScroll = 0, moveu = false;
 
@@ -597,14 +601,12 @@ window.addEventListener('pointerup', () => {
   track.classList.remove('dragging');
 
   if (moveu) {
-    // encaixa no slide mais próximo após soltar
     const passo = step();
     const alvo  = Math.round(track.scrollLeft / passo);
     track.scrollTo({ left: alvo * passo, behavior: 'smooth' });
   }
 });
 
-// impede abrir o link se o usuário arrastou
 track.addEventListener('click', (e) => {
   if (moveu) { e.preventDefault(); moveu = false; }
 }, true);
