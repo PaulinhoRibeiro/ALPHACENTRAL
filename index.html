@@ -363,7 +363,7 @@ body::before{
 <footer class="footer">
   <div class="footer-inner">
     <span>© <span id="ano"></span> Alpha Garage Full Service</span>
-    <span>Central de Comando · v2.1</span>
+    <span>Central de Comando · v2.2</span>
   </div>
 </footer>
 
@@ -389,6 +389,12 @@ const SISTEMAS = [
     icone:'saida',
     desc:'Controle de saída de veículos e liberação de ordens de serviço.',
     url:'https://paulinhoribeiro.github.io/Controlefluxooficina/'
+  },
+  {
+    id:'check', nome:'Alpha Check', tag:'Checklist', cor:'#e879f9',
+    icone:'checklist',
+    desc:'Checklist de vistoria e conferência de serviços do veículo.',
+    url:'https://paulinhoribeiro.github.io/ALPHA-CHECK/'
   },
   {
     id:'almoxarifado', nome:'Almoxarifado Alpha', tag:'Estoque', cor:'#14b8a6',
@@ -435,6 +441,13 @@ const ICONES = {
   saida: SVG(`
     <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
     <polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/>`),
+  checklist: SVG(`
+    <rect x="5" y="4" width="14" height="17" rx="2"/>
+    <path d="M9 3h6a1 1 0 0 1 1 1v1H8V4a1 1 0 0 1 1-1Z"/>
+    <polyline points="8.5 12 10 13.5 13 10.5"/>
+    <line x1="15" y1="12" x2="17" y2="12"/>
+    <polyline points="8.5 17 10 18.5 13 15.5"/>
+    <line x1="15" y1="17" x2="17" y2="17"/>`),
   estoque: SVG(`
     <path d="M3 9.5 12 4l9 5.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1Z"/>
     <path d="M3 9.5h18"/>
