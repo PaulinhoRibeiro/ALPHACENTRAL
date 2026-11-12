@@ -363,7 +363,7 @@ body::before{
 <footer class="footer">
   <div class="footer-inner">
     <span>© <span id="ano"></span> Alpha Garage Full Service</span>
-    <span>Central de Comando · v2.2</span>
+    <span>Central de Comando · v2.3</span>
   </div>
 </footer>
 
@@ -401,6 +401,12 @@ const SISTEMAS = [
     icone:'estoque',
     desc:'Controle de estoque do almoxarifado — peças, entradas e saídas.',
     url:'https://estoquealpha-a5927.web.app/'
+  },
+  {
+    id:'autofiltros', nome:'Autofiltros', tag:'Filtros', cor:'#a3e635',
+    icone:'filtro',
+    desc:'Consulta de aplicação de filtros automotivos por veículo e motor.',
+    url:'https://paulinhoribeiro.github.io/Autofiltros-/'
   },
   {
     id:'timeflow', nome:'TimeFlow Oficina', tag:'Tempo', cor:'#a78bfa',
@@ -452,6 +458,8 @@ const ICONES = {
     <path d="M3 9.5 12 4l9 5.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1Z"/>
     <path d="M3 9.5h18"/>
     <path d="M9 21v-7h6v7"/>`),
+  filtro: SVG(`
+    <path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3Z"/>`),
   pacote: SVG(`
     <path d="m7.5 4.27 9 5.15"/>
     <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/>
